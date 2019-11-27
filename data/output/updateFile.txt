@@ -1,2 +1,0 @@
-type, sku#, itemDescription, price
-UPDATE, 100, Samsung TV, 600
