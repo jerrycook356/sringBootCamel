@@ -18,7 +18,12 @@ public class SimpleCamelRoute extends RouteBuilder {
         //will not poll directory if there is no new files,will poll again when there is new files
         from("{{startRoute}}")
                 .log("Timer invoked and the body "+ environment.getProperty("message"))
+                //choice for whether is mock or not
+                .choice()
+                .when((header("env").isNotEqualTo("mock")))
                 .pollEnrich("{{fromRoute}}")
+                .otherwise()
+                .log("mock env flow and body is  ${body}")
                 .to("{{toRoute1}}");
     }
 }
