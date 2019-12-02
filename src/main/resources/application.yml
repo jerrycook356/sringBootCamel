@@ -1,7 +1,7 @@
 spring:
   profiles:
     active: dev
-camel.springboot.shutdownTimeout: 2
+camel.springboot.shutdownTimeout: 10
 ---
 spring:
   profiles: mock
@@ -13,9 +13,15 @@ message: MOCK environment
 ---
 spring:
   profiles: dev
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/localDB\
+    username: postgres
+    password: postgres
 startRoute: timer:hello?period=10s
 fromRoute: file:data/input?delete=true&readLock=none
 toRoute1: file:data/output
+toRoute2: jdbc:dataSource
 
 message: DEV environment
 
@@ -23,18 +29,30 @@ message: DEV environment
 
 spring:
   profiles: stage
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/localDB\
+    username: postgres
+    password: postgres
 startRoute: timer:hello?period=10s
 fromRoute: file:data/input?delete=true&readLock=none
 toRoute1: file:data/output
+toRoute2: jdbc:dataSource
 
 message: STAGE environment
 ---
 
 spring:
   profiles: prod
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/localDB\
+    username: postgres
+    password: postgres
 startRoute: timer:hello?period=10s
 fromRoute: file:data/input?delete=true&readLock=none
 toRoute1: file:data/output
+toRoute2: jdbc:dataSource
 
 message: PROD environment
 ---
