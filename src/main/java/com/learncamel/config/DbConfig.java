@@ -1,7 +1,7 @@
 package com.learncamel.config;
 
+import org.springframework.boot.autoconfigure.jdbc.DataSourceBuilder;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -14,7 +14,7 @@ public class DbConfig {
     @ConfigurationProperties(prefix = "spring.datasource") //location of configuration used
     public DataSource dataSource(){
         //builds datasource connection using the configuration specified in ConfigurationProperties
-        DataSource ds = DataSourceBuilder.create().build();
-        return ds;
+        return DataSourceBuilder.create().build();
+
     }
 }

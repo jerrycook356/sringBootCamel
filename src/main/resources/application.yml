@@ -8,6 +8,8 @@ spring:
 startRoute: direct:input
 fromRoute: file:data/input?delete=true&readLock=none
 toRoute1: mock:output
+toRoute2: mock:output
+toRoute3: mock:output
 
 message: MOCK environment
 ---
@@ -15,13 +17,14 @@ spring:
   profiles: dev
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://localhost:5432/localDB\
+    url: jdbc:postgresql://localhost:5432/localDB
     username: postgres
     password: postgres
 startRoute: timer:hello?period=10s
 fromRoute: file:data/input?delete=true&readLock=none
 toRoute1: file:data/output
 toRoute2: jdbc:dataSource
+toRoute3: file:data/output?fileName=success.txt
 
 message: DEV environment
 
@@ -31,13 +34,15 @@ spring:
   profiles: stage
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://localhost:5432/localDB\
+    url: jdbc:postgresql://localhost:5432/localDB
     username: postgres
     password: postgres
 startRoute: timer:hello?period=10s
 fromRoute: file:data/input?delete=true&readLock=none
 toRoute1: file:data/output
 toRoute2: jdbc:dataSource
+toRoute3: file:data/output?fileName=success.txt
+
 
 message: STAGE environment
 ---
@@ -46,13 +51,15 @@ spring:
   profiles: prod
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://localhost:5432/localDB\
+    url: jdbc:postgresql://localhost:5432/localDB
     username: postgres
     password: postgres
 startRoute: timer:hello?period=10s
 fromRoute: file:data/input?delete=true&readLock=none
 toRoute1: file:data/output
 toRoute2: jdbc:dataSource
+toRoute3: file:data/output?fileName=success.txt
+
 
 message: PROD environment
 ---

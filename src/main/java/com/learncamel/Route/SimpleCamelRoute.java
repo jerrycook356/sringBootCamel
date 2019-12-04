@@ -2,6 +2,7 @@ package com.learncamel.Route;
 
 import com.learncamel.domain.Item;
 import com.learncamel.process.BuildSQLProcessor;
+import com.learncamel.process.SuccessProcessor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.dataformat.bindy.csv.BindyCsvDataFormat;
@@ -32,6 +33,9 @@ public class SimpleCamelRoute  extends RouteBuilder{
     @Autowired
     BuildSQLProcessor buildSQLProcessor;
 
+    @Autowired
+    SuccessProcessor successProcessor;
+
     @Override
     public void configure() throws Exception {
 
@@ -48,17 +52,22 @@ public class SimpleCamelRoute  extends RouteBuilder{
                 //if mock environment  log message
                 .otherwise()
                 .log("mock env flow and the body is ${body}")
-                .end()
+                .end() //end when
                 // move files to this route , and currently delete the original
                 .to("{{toRoute1}}")
-                //unmarshal the csv in the file to a pojo
+                //unmarshal the csv in the file to an Item
                 .unmarshal(bindy)
-
-                .split(body())
+                .split(body()) // split into separate records
                    .log("Record is ${body}")
+                //buildSQLProcessor parses record and determines which sql action to perform based on
+                //transaction type listed in the file
                    .process(buildSQLProcessor)
-                .to("{{route2}}")
-                .end();
+                //to the postgresql database
+                .to("{{toRoute2}}")
+                .end() //end split
+                 //add processor to verify the data has been inserted into the database.
+                .process(successProcessor)
+                .to("{{toRoute3}}");
 
         log.info("Ending the Camel Route");
 

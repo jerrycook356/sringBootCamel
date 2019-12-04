@@ -38,16 +38,35 @@ public class SimpleCamelRouteMockTest extends CamelTestSupport {
     @Test
     public void testMoveFileMock() throws InterruptedException {
 
-        String message = "type, sku#, itemdescription, price\n"+
-                "ADD,100, Samsung TV, 500\n"+
-                "ADD,101, LG TV, 500";
+        String message = "type,sku#,itemdescription,price\n" +
+                "ADD,100,Samsung TV,500\n" +
+                "ADD,101,LG TV,500";
 
         MockEndpoint mockEndpoint = getMockEndpoint(environment.getProperty("toRoute1"));
+        log.info("mockEndpoint = "+mockEndpoint);
         mockEndpoint.expectedMessageCount(1);
         mockEndpoint.expectedBodiesReceived(message);
 
         producerTemplate.sendBodyAndHeader(environment.getProperty("startRoute")
-        ,message,"env",environment.getProperty("spring.profile.active"));
+                ,message,"env",environment.getProperty("spring.profiles.active"));
+
+        assertMockEndpointsSatisfied();
+
+    }
+    @Test
+    public void testMoveFileMockandDB() throws InterruptedException {
+
+        String message = "type, sku#, itemdescription, price\n"+
+                "ADD,100,Samsung TV,500\n"+
+                "ADD,101,LG TV,500";
+
+        String outMessage = "Data updated successfully";
+        MockEndpoint mockEndpoint1 = getMockEndpoint(environment.getProperty("toRoute3"));
+        mockEndpoint1.expectedMessageCount(1);
+        mockEndpoint1.expectedBodiesReceived(outMessage);
+
+        producerTemplate.sendBodyAndHeader(environment.getProperty("startRoute")
+                ,message,"env",environment.getProperty("spring.profile.active"));
 
         assertMockEndpointsSatisfied();
     }

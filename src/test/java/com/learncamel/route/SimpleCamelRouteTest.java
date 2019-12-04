@@ -15,8 +15,11 @@ import org.springframework.test.context.ActiveProfiles;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 import static junit.framework.TestCase.assertTrue;
+import static org.junit.Assert.assertEquals;
 
 @ActiveProfiles("dev") //gets profile from application.yml
 @RunWith(CamelSpringBootRunner.class)
@@ -43,7 +46,7 @@ public class SimpleCamelRouteTest  {
     public void testMoveFile() throws InterruptedException{
         String message = "type, sku#, itemDesciption, price\n"
                 +"ADD, 100, Samsung TV, 500\n"
-                +"ADD, 101 LG TV, 500";
+                +"ADD, 101 ,LG TV, 500";
         String fileName = "testFile.txt";
         //creates file testFile.txt with the content of message.
         //then runs the camel route
@@ -54,5 +57,58 @@ public class SimpleCamelRouteTest  {
         File outFile = new File("data/output/"+fileName);
         //checks that the file outfile exists, means it was transferred from the data/input directory
         assertTrue(outFile.exists());
+    }
+
+    @Test
+    public void testMoveFile_ADD() throws InterruptedException, IOException {
+
+        String message = "type, sku#, itemDesciption, price\n"
+                +"ADD,100,Samsung TV,500\n"
+                +"ADD,101,LG TV,500";
+        String fileName = "testFile.txt";
+        producerTemplate.sendBodyAndHeader(environment.getProperty("fromRoute"),
+                message,Exchange.FILE_NAME,fileName);
+        Thread.sleep(3000);
+        File outFile = new File("data/output/"+fileName);
+        assertTrue(outFile.exists());
+        String outputMessage = "Data updated successfully";
+        String output = new String(Files.readAllBytes(Paths.get("data/output/success.txt")));
+
+        assertEquals(outputMessage,output);
+
+    }
+    @Test
+    public void testMoveFile_UPDATE() throws InterruptedException, IOException {
+
+        String message = "type,sku#,itemdescription,price\n" +
+                "UPDATE,100,Samsung TV,600";
+        String fileName="fileUpdate.txt";
+
+        producerTemplate.sendBodyAndHeader(environment.getProperty("fromRoute")
+                ,message, Exchange.FILE_NAME,fileName);
+
+        Thread.sleep(3000);
+
+        File outFile = new File("data/output/"+fileName);
+        assertTrue(outFile.exists());
+        String outputMessage = "Data updated successfully";
+        String output = new String(Files.readAllBytes(Paths.get("data/output/Success.txt")));
+        assertEquals(outputMessage,output);
+    }
+    @Test
+    public void testMoveFile_DELETE() throws  InterruptedException, IOException{
+        String message = "type,sku#,itemdescription,price\n"+
+                "DELETE,100,Samsung TV,600";
+        String fileName = "fileDelete.txt";
+
+        producerTemplate.sendBodyAndHeader(environment.getProperty("fromRoute"),
+                message,Exchange.FILE_NAME,fileName);
+        Thread.sleep(3000);
+
+        File outFile = new File("data/output/"+fileName);
+        assertTrue(outFile.exists());
+        String outputMessage = "Data updated successfully";
+        String output = new String(Files.readAllBytes(Paths.get("data/output/success.txt")));
+        assertEquals(outputMessage,output);
     }
 }
